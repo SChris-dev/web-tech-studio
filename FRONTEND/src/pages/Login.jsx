@@ -32,6 +32,7 @@ const Login = () => {
 
             localStorage.setItem('login_token', response.data.data.token);
             localStorage.setItem('username', response.data.data.username);
+            localStorage.setItem('full_name', response.data.data.full_name);
             navigate('/')
         }
         catch (error) {
@@ -53,14 +54,14 @@ const Login = () => {
                                 <div className="card-body">
                                     <form onSubmit={handleSubmit}>
                                         <div className="form-group mb-2">
-                                            <label for="username">Username</label>
-                                            <input type="text" name="username" id="username" className="form-control" autofocus
+                                            <label htmlFor="username">Username</label>
+                                            <input type="text" name="username" id="username" className="form-control" autoFocus
                                             value={loginData.username}
                                             onChange={handleChange}
                                             />
                                         </div>
                                         <div className="form-group mb-2">
-                                            <label for="password">Password</label>
+                                            <label htmlFor="password">Password</label>
                                             <input type="password" name="password" id="password" className="form-control"
                                             value={loginData.password}
                                             onChange={handleChange}/>

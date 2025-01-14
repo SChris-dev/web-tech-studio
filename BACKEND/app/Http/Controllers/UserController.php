@@ -14,6 +14,7 @@ use App\Models\LessonContent;
 use App\Models\Option;
 use App\Models\CompletedLesson;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -28,9 +29,10 @@ class UserController extends Controller
             ], 404);
         }
 
-        if (Enrollment::where('user_id', $user->id)->first() && !Enrollment::where('course_id', $course->id)->first()) {
+        $checkEnrolment = Enrollment::where('user_id', $user->id)->where('course_id', $course->id)->first();
+        if (!$checkEnrolment) {
 
-            $enrollment = Enrollment::create([
+            Enrollment::create([
                 'user_id' => $user->id,
                 'course_id' => $course->id
             ]);
@@ -51,7 +53,11 @@ class UserController extends Controller
     public function progressUser() {
         $user = Auth::user();
 
-        $progress = User::with(['enrollments.course'], ['completed_lessons'])->find($user->id);
+        $progress = User::with('enrollments.course.sets.lessons.completed_lessons')->find($user->id);
+
+        Log::info([
+            'progress' => $progress,
+        ]);
 
         $response = [
             'status' => 'success',
@@ -71,12 +77,14 @@ class UserController extends Controller
                             'updated_at' => $course->updated_at,
                         ],
                         'completed_lessons' => $course->sets->flatMap(function ($set) {
-                            return $set->lessons->map(function ($lesson) {
-                                return [
-                                    'id' => $lesson->id,
-                                    'name' => $lesson->name,
-                                    'order' => $lesson->order,
-                                ];
+                            return $set->lessons->flatMap(function ($lesson) {
+                                return $lesson->completed_lessons->map(function($completed_lesson) use ($lesson) {
+                                    return [
+                                        'id' => $completed_lesson->lesson_id,
+                                        'name' => $lesson->name,
+                                        'order' => $lesson->order,
+                                    ];
+                                });
                             });
                         })
                     ];

@@ -110,12 +110,12 @@ class LessonController extends Controller
     }
 
     public function checkAnswer(Request $req, string $lesson_id, string $content_id) {
-        if (!Auth::guard('admin')->check()) { 
-            return response()->json([ 
-                'status' => 'insufficient_permissions', 
-                'message' => 'Access forbidden', 
-            ], 403); 
-        }
+        // if (!Auth::guard('admin')->check()) { 
+        //     return response()->json([ 
+        //         'status' => 'insufficient_permissions', 
+        //         'message' => 'Access forbidden', 
+        //     ], 403); 
+        // }
 
         $lesson = Lesson::find($lesson_id);
         $lessonContent = LessonContent::find($content_id);

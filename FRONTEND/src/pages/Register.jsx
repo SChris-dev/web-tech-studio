@@ -33,6 +33,7 @@ const Register = () => {
 
             localStorage.setItem('login_token', response.data.data.token);
             localStorage.setItem('username', response.data.data.username);
+            localStorage.setItem('full_name', response.data.data.full_name);
             navigate('/');
         }
         catch (error) {
@@ -55,19 +56,19 @@ const Register = () => {
                                 <div className="card-body">
                                     <form onSubmit={handleSubmit}>
                                         <div className="form-group mb-2">
-                                            <label for="full_name">Full Name</label>
-                                            <input type="text" name="full_name" id="full_name" className="form-control" autofocus
+                                            <label htmlFor="full_name">Full Name</label>
+                                            <input type="text" name="full_name" id="full_name" className="form-control" autoFocus
                                             value={formData.full_name}
                                             onChange={handleChange}/>
                                         </div>
                                         <div className="form-group mb-2">
-                                            <label for="username">Username</label>
+                                            <label htmlFor="username">Username</label>
                                             <input type="text" name="username" id="username" className="form-control"
                                             value={formData.username}
                                             onChange={handleChange}/>
                                         </div>
                                         <div className="form-group mb-2">
-                                            <label for="password">Password</label>
+                                            <label htmlFor="password">Password</label>
                                             <input type="password" name="password" id="password" className="form-control"
                                             value={formData.password}
                                             onChange={handleChange}/>

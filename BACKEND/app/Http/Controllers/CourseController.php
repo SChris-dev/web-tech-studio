@@ -132,14 +132,14 @@ class CourseController extends Controller
 
     public function getCourse(string $course_slug) {
         $course = Course::with('sets.lessons.lesson_contents.options')->where('slug', $course_slug)->first();
-
+    
         if (!$course) {
             return response()->json([
                 'status' => 'not_found',
                 'message' => 'Resource not found'
             ], 404);
         }
-
+    
         $response = [
             'status' => 'success',
             'message' => 'Course details retrieved successfully',
@@ -162,21 +162,33 @@ class CourseController extends Controller
                                 'name' => $lesson->name,
                                 'order' => $lesson->order,
                                 'contents' => $lesson->lesson_contents->map(function ($content) {
-                                    return [
+                                    $contentData = [
                                         'id' => $content->id,
                                         'type' => $content->type,
                                         'content' => $content->content,
                                         'order' => $content->order,
                                     ];
+    
+                                    // If content type is 'quiz', include options
+                                    if ($content->type === 'quiz') {
+                                        $contentData['options'] = $content->options->map(function ($option) {
+                                            return [
+                                                'id' => $option->id,
+                                                'option_text' => $option->option_text,
+                                            ];
+                                        });
+                                    }
+    
+                                    return $contentData;
                                 })
                             ];
                         })
                     ];
                 })
-
             ]
         ];
-
+    
         return response()->json($response, 200);
     }
+    
 }

@@ -11,34 +11,26 @@ const HomePage = () => {
     const [otherCourses, setOtherCourses] = useState([]);
 
     useEffect(() => {
+        document.title = "Home Page";
+
         const fetchData = async () => {
             try {
-                if (!token) {
-                    navigate('/login');
-                    return;
-                }
-
-                document.title = "Home Page";
+                
 
                 // Fetch user progress
-                const progressResponse = await Api.get('/users/progress', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const progressResponse = await Api.get('/users/progress');
 
                 const progressData = progressResponse.data.data;
+                const enrolledCourseIds = progressData.progress.map((item) => item.course.id);
                 setProgress(progressData.progress);
 
                 // Fetch other courses
-                const coursesResponse = await Api.get('/api/courses', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const coursesResponse = await Api.get('/courses');
 
                 const coursesData = coursesResponse.data.data.courses;
-                const publishedCourses = coursesData.filter((course) => course.is_published === 1);
+                const publishedCourses = coursesData.filter(
+                    (course) => course.is_published === 1 && !enrolledCourseIds.includes(course.id)
+                );
                 setOtherCourses(publishedCourses);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -50,12 +42,11 @@ const HomePage = () => {
         };
 
         fetchData();
-    }, [navigate, token]);
+    }, []);
 
     return (
         <>
             <main className="py-5">
-                {/* My Courses Section */}
                 <section className="my-courses">
                     <div className="container">
                         <h4 className="mb-3">My Courses</h4>
@@ -66,21 +57,13 @@ const HomePage = () => {
                                         <div className="card-body">
                                             <h5 className="mb-2">
                                                 <NavLink
-                                                    to={`/course/${item.course.slug}`}
+                                                    to={`/${item.course.slug}`}
                                                     className="text-decoration-none"
                                                 >
                                                     {item.course.name}
                                                 </NavLink>
                                             </h5>
-                                            <p className="text-muted mb-3">{item.course.description}</p>
-                                            <h6>Completed Lessons:</h6>
-                                            <ul className="list-group">
-                                                {item.completed_lessons.map((lesson) => (
-                                                    <li key={lesson.id} className="list-group-item">
-                                                        {lesson.name}
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                            <p className="text-muted">{item.course.description}</p>
                                         </div>
                                     </div>
                                 ))
@@ -100,7 +83,7 @@ const HomePage = () => {
                                 otherCourses.map((course) => (
                                     <NavLink
                                         key={course.id}
-                                        to={`/course/${course.slug}`}
+                                        to={`/${course.slug}`}
                                         className="card text-decoration-none bg-body-tertiary"
                                     >
                                         <div className="card-body">

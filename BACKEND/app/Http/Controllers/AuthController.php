@@ -59,12 +59,12 @@ class AuthController extends Controller
  
         if ($validate->fails()) { 
             return response()->json([ 
-                'message' => $validation->errors() 
+                'message' => $validate->errors() 
             ], 422); 
         } 
  
         $admin = Administrator::where('username', $req->username)->first(); 
-        if ($admin && \Hash::check($req->password, $admin->password)) { 
+        if ($admin && Hash::check($req->password, $admin->password)) { 
             $token = $admin->createToken('admin_token')->plainTextToken; 
  
             return response()->json([ 
@@ -91,6 +91,7 @@ class AuthController extends Controller
                 'message' => 'Login successful',
                 'data' => [
                     'id' => $user->id,
+                    'full_name' => $user->full_name,
                     'username' => $user->username,
                     'created_at' => $user->created_at,
                     'updated_at' => $user->updated_at,
